@@ -8,3 +8,10 @@ export const loginSchema = yup
     password: yup.string().required('Password is required'),
   })
   .required();
+
+export const RoleSchema = yup
+.object({
+  username: yup.string().required('Username is required'),
+  password: yup.string().required('Password is required'),
+})
+.required();

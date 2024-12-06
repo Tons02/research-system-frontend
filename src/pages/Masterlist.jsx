@@ -33,7 +33,7 @@ const Masterlist = () => {
       }}
       >
       {accessPermissions.includes("masterlist:companies:sync") && (
-      <Card destination="company" icon={<ApartmentIcon />} title="Company" subtitle="Synching of Company Masterlist from Ymir to Lotus"/>
+      <Card destination="company"icon={<ApartmentIcon />} title="Company" subtitle="Synching of Company Masterlist from Ymir to Lotus"/>
       )}
       {accessPermissions.includes("masterlist:business-units:sync") && (
       <Card destination="business_unit" icon={<BusinessCenterIcon />} title="Business Unit" subtitle="Synching of Business Unit Masterlist from Ymir to Lotus"/>

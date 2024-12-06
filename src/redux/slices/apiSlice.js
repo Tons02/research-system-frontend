@@ -14,7 +14,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Companies'],
+  tagTypes: ['Companies', 'Roles'],
   endpoints: (builder) => ({
     // Login endpoints
     login: builder.mutation({
@@ -38,11 +38,44 @@ export const apiSlice = createApi({
     }),
     invalidatesTags: ['Companies'],
   }),
+  getRole: builder.query({
+    query: ({ search, page, per_page, status }) => `/role?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
+    method: 'GET',
+    providesTags: ['Companies'],
+    }),
+    addRole: builder.mutation({
+      query: (role) => ({
+        url: `/role`,
+        method: 'POST',
+        body: role,
+      }),
+      invalidatesTags: ['Roles'],
+    }),
+    updateRole: builder.mutation({
+      query: (role) => ({
+        url: `/role/${role.id}`,
+        method: 'PATCH',
+        body: role,
+      }),
+      invalidatesTags: ['Roles'],
+    }),
+    archivedRole: builder.mutation({
+      query: ({ id }) => ({
+        url: `/Role-archived/${id}`,
+        method: 'PUT',
+        body: id,
+      }),
+      invalidatesTags: ['Roles'],
+    }),
   }),
 });
 
 // Export the generated hooks
 export const {
   useLoginMutation,
-  useGetCompaniesQuery
+  useGetCompaniesQuery,
+  useGetRoleQuery,
+  useAddRoleMutation,
+  useUpdateRoleMutation,
+  useArchivedRoleMutation,
 } = apiSlice;

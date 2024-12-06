@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import EastOutlinedIcon from '@mui/icons-material/EastOutlined';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material';
 
 const bull = (
   <Box
@@ -20,6 +21,7 @@ const bull = (
 export default function BasicCard({icon, title, subtitle, destination}) {
 
 const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleCardClick = () => {
     navigate(destination); // Replace "/company" with your desired route
@@ -32,7 +34,7 @@ const navigate = useNavigate();
         cursor: "pointer",
         transition: "all 0.3s ease", // Smooth transition for color change
         "&:hover": {
-            backgroundColor: "#1cb7ff", // Change the background color on hover
+            backgroundColor: theme.palette.primary.main, // Change the background color on hover
             color: "white", // Change the text color when hovered
         },
         }}
