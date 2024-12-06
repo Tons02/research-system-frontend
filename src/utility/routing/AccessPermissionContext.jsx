@@ -6,14 +6,8 @@ const AccessPermissionContext = ({ permission, children }) => {
   const storedData = JSON.parse(localStorage.getItem("user"));
 
   // Declare accessPermissions outside the block
-  let accessPermissions = [];
-
-  if (storedData.userType === "admin") {
-    accessPermissions = ["admin", "user"]; // Array of permissions for admin
-  } else {
-    accessPermissions = ["user"]; // Array of permissions for user
-  }
-
+  let accessPermissions = storedData?.role?.access_permission;
+  
   if (!accessPermissions?.includes(permission)) {
     return (
       <Box

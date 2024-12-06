@@ -23,10 +23,13 @@ import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Button, Collapse, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import SettingsIcon from '@mui/icons-material/Settings';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Dashboard, ExpandLess, ExpandMore } from '@mui/icons-material';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import BallotIcon from '@mui/icons-material/Ballot';
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 
 const drawerWidth = 240;
 
@@ -212,7 +215,7 @@ export default function MiniDrawer() {
                         justifyContent: 'center',
                       },
                 ]}
-                onClick={() => handleNavigation('/dashboard/users')}
+                onClick={() => handleNavigation('/dashboard')}
               >
                 <ListItemIcon
                   sx={[
@@ -260,7 +263,11 @@ export default function MiniDrawer() {
                     justifyContent: 'center',
                   },
             ]}
-            onClick={toggleExpand}
+            
+            onClick={() => {
+              handleNavigation('/dashboard/masterlist');
+              toggleExpand();
+            }}
           >
             <ListItemIcon
               sx={[
@@ -304,13 +311,13 @@ export default function MiniDrawer() {
             sx={{
               pl: open ? 3 : 2.5,
             }}
-            onClick={() => handleNavigation('/dashboard/user-role')}
+            onClick={() => handleNavigation('/dashboard/masterlist/company')}
           >
             <ListItemIcon>
-              <AccountCircleIcon />
+              <ApartmentIcon />
             </ListItemIcon>
             <ListItemText
-              primary="User Role"
+              primary="Company"
               sx={{
                 opacity: open ? 1 : 0,
               }}
@@ -320,18 +327,83 @@ export default function MiniDrawer() {
             sx={{
               pl: open ? 3 : 2.5,
             }}
-            onClick={() => handleNavigation('/dashboard/role-management')}
+            onClick={() => handleNavigation('/dashboard/masterlist/business_unit')}
           >
             <ListItemIcon>
-              <AccountCircleIcon />
+              <BusinessCenterIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Role Management"
+              primary="Business Unit"
               sx={{
                 opacity: open ? 1 : 0,
               }}
             />
           </ListItemButton>
+          <ListItemButton
+            sx={{
+              pl: open ? 3 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/masterlist/department')}
+          >
+            <ListItemIcon>
+              <AccountTreeIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Department"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+          <ListItemButton
+            sx={{
+              pl: open ? 3 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/masterlist/unit')}
+          >
+            <ListItemIcon>
+              <BallotIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Units"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+          <ListItemButton
+            sx={{
+              pl: open ? 3 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/masterlist/sub_unit')}
+          >
+            <ListItemIcon>
+              <ViewHeadlineIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Sub Unit"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+          <ListItemButton
+            sx={{
+              pl: open ? 3 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/masterlist/locations')}
+          >
+            <ListItemIcon>
+              <ShareLocationIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Locations"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+          
         </Collapse>
         
             </List>

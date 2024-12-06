@@ -3,9 +3,12 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PrivateRoutes from "./PrivateRoutes";
 import PreventLoginRoutes from "./PreventLoginRoutes";
 import Mainlayout from "../../layout/MainLayout"
-import Login from "../../components/Login";
-import NotFound from "../../components/NotFound";
-import Dashboard from "../../components/Dashboard";
+import Login from "../../pages/Login";
+import NotFound from "../../pages/NotFound";
+import Dashboard from "../../pages/Dashboard";
+import Masterlist from "../../pages/Masterlist";
+import AccessPermissionContext from "./AccessPermissionContext";
+import Company from "../../pages/Company";
 
 const router = createBrowserRouter([
     {
@@ -26,18 +29,23 @@ const router = createBrowserRouter([
             index: true,
             element: <Dashboard/>,
           },
-        //   {
-        //     path: "users",
-        //     index: true,
-        //     element: (
-        //          <AccessPermissionContext
-        //             permission="admin"
-        //             context="routing"
-        //           >
-        //           <Users/>
-        //         </AccessPermissionContext>
-        //     )
-        //   },
+          {
+            path: "masterlist",
+            index: true,
+            element: <Masterlist/>,
+          },
+          {
+            path: "masterlist/company",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="masterlist:companies:sync"
+                    context="routing"
+                  >
+                  <Company/>
+                </AccessPermissionContext>
+            )
+          },
         //   {
         //       path: "monitoring",
         //       index: true,

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_RESEARCH_SYSTEM_ENDPOINT, // Corrected base URL
+    baseUrl: import.meta.env.VITE_YMIR_ENDPOINT, // Corrected base URL
     prepareHeaders: (headers) => {
       // Add the authorization token from localStorage (if it exists)
       const token = localStorage.getItem("token");
@@ -16,16 +16,8 @@ export const apiSlice = createApi({
   }),
   tagTypes: ['Companies'],
   endpoints: (builder) => ({
-    // Login endpoints
-    login: builder.mutation({
-      query: (credentials) => ({
-        url: `/login`,
-        method: 'POST',
-        body: credentials,
-      }),
-    }),
    // Companies endpoints
-  getCompanies: builder.query({
+  getYmirCompanies: builder.query({
   query: ({ search, page, per_page, status }) => `/companies?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
   method: 'GET',
   providesTags: ['Companies'],
@@ -43,6 +35,5 @@ export const apiSlice = createApi({
 
 // Export the generated hooks
 export const {
-  useLoginMutation,
-  useGetCompaniesQuery
+  useGetYmirCompaniesQuery
 } = apiSlice;
