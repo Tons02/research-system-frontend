@@ -30,6 +30,9 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BallotIcon from '@mui/icons-material/Ballot';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import ShareLocationIcon from '@mui/icons-material/ShareLocation';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import GroupIcon from '@mui/icons-material/Group';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const drawerWidth = 240;
 
@@ -117,14 +120,8 @@ export default function MiniDrawer() {
   const [openModal, setOpenModal] = React.useState(false);
   const storedData = JSON.parse(localStorage.getItem("user"));
 
-  // Declare accessPermissions outside the block
-  let accessPermissions = [];
-
-  if (storedData.userType === "admin") {
-    accessPermissions = ["admin", "user"]; // Array of permissions for admin
-  } else {
-    accessPermissions = ["user"]; // Array of permissions for user
-  }
+  let accessPermissions = storedData?.role?.access_permission;
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -161,9 +158,15 @@ export default function MiniDrawer() {
     };
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedUserManagement, setIsExpandedUserManagement] = useState(false);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const toggleExpandUserManagement = () => {
+    setIsExpandedUserManagement(!isExpandedUserManagement);
+    
   };
 
   return (
@@ -248,6 +251,7 @@ export default function MiniDrawer() {
                 />
               </ListItemButton>
             </ListItem>
+            {accessPermissions.includes("masterlist") && (
           <ListItem disablePadding sx={{ display: 'block' }}>
           <ListItemButton
             sx={[
@@ -304,16 +308,31 @@ export default function MiniDrawer() {
             )}
           </ListItemButton>
         </ListItem>
-
+        )}
         {/* Child Items */}
         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        
+        {accessPermissions.includes("masterlist:companies:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/company')}
           >
-            <ListItemIcon>
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <ApartmentIcon />
             </ListItemIcon>
             <ListItemText
@@ -323,13 +342,29 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("masterlist:business-units:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/business_unit')}
           >
-            <ListItemIcon>
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <BusinessCenterIcon />
             </ListItemIcon>
             <ListItemText
@@ -339,13 +374,29 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("masterlist:departments:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/department')}
           >
-            <ListItemIcon>
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <AccountTreeIcon />
             </ListItemIcon>
             <ListItemText
@@ -355,13 +406,29 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("masterlist:units:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/unit')}
           >
-            <ListItemIcon>
+             <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <BallotIcon />
             </ListItemIcon>
             <ListItemText
@@ -371,13 +438,29 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("masterlist:subunits:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/sub_unit')}
           >
-            <ListItemIcon>
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <ViewHeadlineIcon />
             </ListItemIcon>
             <ListItemText
@@ -387,13 +470,29 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("masterlist:locations:sync") && (
           <ListItemButton
             sx={{
-              pl: open ? 3 : 2.5,
+              pl: open ? 5 : 2.5,
             }}
             onClick={() => handleNavigation('/dashboard/masterlist/locations')}
           >
-            <ListItemIcon>
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
               <ShareLocationIcon />
             </ListItemIcon>
             <ListItemText
@@ -403,10 +502,137 @@ export default function MiniDrawer() {
               }}
             />
           </ListItemButton>
-          
+        )}
+        </Collapse>
+
+        {/* user management */}
+        {accessPermissions.includes("user-management") && (
+          <ListItem disablePadding sx={{ display: 'block' }}>
+          <ListItemButton
+            sx={[
+              {
+                minHeight: 48,
+                px: 2.5,
+              },
+              open
+                ? {
+                    justifyContent: 'initial',
+                  }
+                : {
+                    justifyContent: 'center',
+                  },
+            ]}
+            
+            onClick={() => {
+              handleNavigation('/dashboard/user-management');
+              toggleExpandUserManagement();
+            }}
+          >
+            <ListItemIcon
+              sx={[
+                {
+                  minWidth: 0,
+                  justifyContent: 'center',
+                },
+                open
+                  ? {
+                      mr: 2,
+                    }
+                  : {
+                      mr: 'auto',
+                    },
+              ]}
+            >
+              <AssignmentIndIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="User Management"
+              sx={[
+                open
+                  ? {
+                      opacity: 1,
+                    }
+                  : {
+                      opacity: 0,
+                    },
+              ]}
+            />
+            {open && ( <div>
+            {isExpandedUserManagement ? <ExpandLess /> : <ExpandMore />}
+            </div>
+            )}
+          </ListItemButton>
+        </ListItem>
+        )}
+        {/* Child Items */}
+        <Collapse in={isExpandedUserManagement} timeout="auto" unmountOnExit>
+        
+        {accessPermissions.includes("user-accounts:crud") && (
+          <ListItemButton
+            sx={{
+              pl: open ? 5 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/user-management/user-accounts')}
+          >
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
+              <GroupIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="User Accounts"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+        )}
+        
+        {accessPermissions.includes("role-management:crud") && (
+          <ListItemButton
+            sx={{
+              pl: open ? 5 : 2.5,
+            }}
+            onClick={() => handleNavigation('/dashboard/user-management/role-management')}
+          >
+            <ListItemIcon
+             sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
+              },
+              open
+                ? {
+                    mr: 2,
+                  }
+                : {
+                    mr: 'auto',
+                  },
+            ]}>
+              <ManageAccountsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Role Management"
+              sx={{
+                opacity: open ? 1 : 0,
+              }}
+            />
+          </ListItemButton>
+        )}
         </Collapse>
         
-            </List>
+        </List>
         <Divider />
         <List>
           <ListItem disablePadding sx={{ display: 'block' }}>

@@ -30,7 +30,7 @@ export const apiSlice = createApi({
   method: 'GET',
   providesTags: ['Companies'],
   }),
-  addUser: builder.mutation({
+  addCompanies: builder.mutation({
     query: (companies) => ({
       url: `/companies`,
       method: 'POST',

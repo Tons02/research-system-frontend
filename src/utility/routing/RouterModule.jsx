@@ -9,6 +9,9 @@ import Dashboard from "../../pages/Dashboard";
 import Masterlist from "../../pages/Masterlist";
 import AccessPermissionContext from "./AccessPermissionContext";
 import Company from "../../pages/Company";
+import UserManagement from "../../pages/UserManagement";
+import User from "../../pages/User";
+import Role from "../../pages/Role";
 
 const router = createBrowserRouter([
     {
@@ -43,6 +46,43 @@ const router = createBrowserRouter([
                     context="routing"
                   >
                   <Company/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "user-management",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="user-management"
+                    context="routing"
+                  >
+                  <UserManagement/>
+                </AccessPermissionContext>
+            )
+          },
+          
+          {
+            path: "user-management/user-accounts",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="user-management"
+                    context="routing"
+                  >
+                  <User/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "user-management/role-management",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="user-accounts:crud"
+                    context="routing"
+                  >
+                  <Role/>
                 </AccessPermissionContext>
             )
           },
