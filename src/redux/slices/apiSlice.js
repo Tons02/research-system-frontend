@@ -61,7 +61,7 @@ export const apiSlice = createApi({
     }),
     archivedRole: builder.mutation({
       query: ({ id }) => ({
-        url: `/Role-archived/${id}`,
+        url: `/role-archived/${id}`,
         method: 'PUT',
         body: id,
       }),

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, Menu, MenuItem, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
+import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, Grid, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Select, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom'
@@ -18,6 +18,10 @@ const Role = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [viewAccessPermission, setViewAccessPermission] = useState(false);
+  const [restoreRole, setRestoreRole] = useState(false);
+  const [activeMenuRow, setActiveMenuRow] = useState(null); 
+  
 
 
   const [snackbar, setSnackbar] = useState({
@@ -39,7 +43,6 @@ const Role = () => {
     defaultValues: {
       name:"",
       access_permission:[], 
-
     },
     resolver: yupResolver(RoleSchema),
   });
@@ -58,8 +61,10 @@ const Role = () => {
   
   // Handle Create Role
   const handleCreateRole = async (data) => {
+   console.log(data)
+
     try {
-      const response = await addRole(data).unwrap();  // Using RTK Query's unwrap method for response handling
+      const response = await addRole(data).unwrap();  
       console.log('Role created:', response);
       setOpenDialog(false);
       refetch();
@@ -138,8 +143,21 @@ const Role = () => {
 
   const handleEdit = (row) => {
     setSelectedID(row.id);
-    reset(row);
-    console.log(row)
+    // Map row.access_permission to checked state
+    const newChecked = Array(11).fill(false); // Assuming you have 11 checkboxes
+
+    row.access_permission.forEach((permission) => {
+      const index = Object.values(permissionsMap).indexOf(permission);
+      if (index > -1) {
+        newChecked[index] = true;
+      }
+    });
+
+    setChecked(newChecked);
+    setValue('access_permission', row.access_permission);
+    
+    reset(row); // Reset the form with new data
+    console.log(row);
     setOpenUpdateDialog(true);
   };
 
@@ -148,10 +166,6 @@ const Role = () => {
     setOpenDeleteDialog(true);
   };
 
-  const handleClose = () => {
-    setSelectedID(null)
-    setOpenDeleteDialog(false);
-  };
 
 
   const handleSearchChange = (event) => {
@@ -180,35 +194,94 @@ const Role = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const handleClickDrowpDown = (event) => {
+  const handleClickDrowpDown = (event, row) => {
+    setActiveMenuRow(row.id); 
     setAnchorEl(event.currentTarget);
   };
   const handleCloseDropDown = () => {
     setAnchorEl(null);
   };
 
+  
+  const [checked, setChecked] = useState(Array(11).fill(false));
 
-  const accessPermission = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-  ];
+  const handleSelectAllRole = (event) => {
+    const isChecked = event.target.checked;
+    setChecked(Array(11).fill(isChecked)); // Set all checkboxes to the same value
+  };
+
+  
+  const handleClose = () => {
+    setViewAccessPermission(false);
+    setRestoreRole(false);
+    setSelectedID(null)
+    setOpenDialog(false);
+    setOpenUpdateDialog(false);
+    setOpenDeleteDialog(false);
+    setChecked(Array(11).fill(false));
+  };
 
 
+  const permissionsMap = {
+    0: "dashboard",
+    1: "masterlist",
+    2: "masterlist:companies:sync",
+    3: "masterlist:business-units:sync",
+    4: "masterlist:departments:sync",
+    5: "masterlist:units:sync",
+    6: "masterlist:subunits:sync",
+    7: "masterlist:locations:sync",
+    8: "user-management",
+    9: "user-accounts:crud",
+    10: "role-management:crud",
+  };
+
+  const handleCheckboxChange = (index, parentIndex) => (event) => {
+    const isChecked = event.target.checked;
+    const newChecked = [...checked];
+    newChecked[index] = isChecked;
+  
+    // Handle child dependencies
+    if (index === 1 && !isChecked) { // Masterlist
+      for (let i = 2; i <= 7; i++) {
+        newChecked[i] = false;
+      }
+    }
+  
+    if (index === 8 && !isChecked) { // User Management
+      for (let i = 9; i <= 10; i++) {
+        newChecked[i] = false;
+      }
+    }
+  
+    // Update access_permission array based on newChecked
+    const newAccessPermission = Object.keys(permissionsMap)
+      .filter((key) => newChecked[key])
+      .map((key) => permissionsMap[key]);
+  
+    setChecked(newChecked);
+    setValue('access_permission', newAccessPermission);
+    console.log(newAccessPermission);
+  };
+
+
+  // Hide children unless their parent is selected
+  const renderChild = (parentIndex, children) => {
+    return checked[parentIndex] ? (
+      <Box sx={{ display: "flex", flexDirection: "column", ml: 3 }}>
+        {children}
+      </Box>
+    ) : null;
+  };
+
+  
 
   return (
     <>
      <Typography variant="h4" gutterBottom>
        Role
      </Typography>
-     <Breadcrumbs aria-label="breadcrumb" sx={{ paddingBottom: 2 }}>
+     <Breadcrumbs aria-label="breadcrumb">
         <Link color="inherit" href="/">Home</Link>
         <Link color="inherit" href="/dashboard/masterlist">User Management</Link>
         <Link color="inherit" href="/dashboard/masterlist/company">Role</Link>
@@ -244,7 +317,7 @@ const Role = () => {
           variant="outlined"
           value={search}
           onChange={handleSearchChange}
-          sx={{ width: 300 }} />
+          sx={{ width: 300}} />
       </Box>
       <Box sx={{ flex: 1, overflow: 'auto'}}>
       <Table  sx={{ minWidth: 650 }} aria-label="simple table">
@@ -296,7 +369,7 @@ const Role = () => {
               <TableRow key={row.id}>
                 <TableCell align="center" scope="row">{row.id}</TableCell>
                 <TableCell component="th" align="center" scope="row">{row.name}</TableCell>
-                <TableCell align="center"><RemoveRedEyeIcon /></TableCell>
+                <TableCell align="center"><RemoveRedEyeIcon onClick={() => { setViewAccessPermission(true); handleEdit(row);  }}/></TableCell>
                 <TableCell align="center">{dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
                 <TableCell align="center">
                 {row.deleted_at === null ? (
@@ -307,13 +380,13 @@ const Role = () => {
                 </TableCell>
                 <TableCell align="center" sx={{ padding: '5px', gap:2 }}>
                   <MoreVertIcon 
-                  onClick={handleClickDrowpDown}
+                  onClick={(event) => handleClickDrowpDown(event, row)} 
                   />
 
                 <Menu
                     id="basic-menu"
                     anchorEl={anchorEl}
-                    open={open}
+                    open={activeMenuRow === row.id && open}
                     onClose={handleCloseDropDown}
                     MenuListProps={{
                       'aria-labelledby': 'basic-button',
@@ -321,12 +394,12 @@ const Role = () => {
                   >
                      {
                   status === "active" ? (
-                    <>
+                    <Box>
                     <MenuItem onClick={() => { handleCloseDropDown(); handleEdit(row); }}>Edit</MenuItem>
                     <MenuItem onClick={() => { handleCloseDropDown(); handleDeleteClick(row); }}>Archived</MenuItem> 
-                    </>
+                    </Box>
                   ):(
-                    <MenuItem onClick={handleCloseDropDown}>Restore</MenuItem>
+                    <MenuItem onClick={() => { handleCloseDropDown(); handleDeleteClick(row); setRestoreRole(true); }}>Restore</MenuItem>
                    
                   )}
                  
@@ -353,53 +426,221 @@ const Role = () => {
       </Box>
     </TableContainer>
 
-    {/* Create Sugar Monitoring Dialog */}
-    <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle> Daily Sugar input</DialogTitle>
+    {/* Create Role Dialog Dialog */}
+    <Dialog open={openDialog} fullWidth maxWidth="sm">
+        <DialogTitle> Create New Role</DialogTitle>
         <form onSubmit={handleSubmit(handleCreateRole)}>
         <Divider />
         <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField 
-                {...register('name')} 
-                label="Name" 
-                margin="dense" 
-                fullWidth
-                error={!!errors.name} 
-                helperText={errors.name?.message} 
-              />
-            </Grid>
-            <Grid item xs={6}>
+            <TextField 
+              {...register('name')} 
+              label="Name" 
+              margin="dense" 
+              fullWidth
+              error={!!errors.name} 
+              helperText={errors.name?.message} 
+            />
             
-            </Grid>
-          </Grid>
-          <TextField 
-            {...register('access_permission')} 
-            label="Access Permission" 
-            fullWidth 
-            margin="dense" 
-            error={!!errors.access_permission} 
-            helperText={errors.access_permission?.message} 
+       {errors.access_permission && (
+        <Typography color="error">{errors.access_permission.message}</Typography>
+      )}
+         <Box>
+        
+         <Box
+            sx={{
+              border: '1px solid #a6a6a6', // Enclose CSS values in quotes
+              borderRadius: '10px', // Use camelCase for CSS property names
+              paddingLeft: '10px',
+              paddingRight: '10px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+      {/* Select Role */}
+      <FormControlLabel
+        label="Select Role"
+        control={
+          <Checkbox
+            {...register('access_permission')}
+            checked={checked.every((val) => val)} // All checked
+            indeterminate={
+              !checked.every((val) => val) && checked.some((val) => val)
+            } // Some but not all are checked
+            onChange={handleSelectAllRole}
           />
+        }
+      />
+      {/* Dashboard */}
+      <FormControlLabel
+        label="Dashboard"
+        control={
+          <Checkbox
+            checked={checked[0]}
+            onChange={handleCheckboxChange(0)}
+          />
+        }
+      />
+
+      {/* Masterlist */}
+      <FormControlLabel
+        label="Masterlist"
+        control={
+          <Checkbox
+            checked={checked[1]}
+            onChange={handleCheckboxChange(1)}
+          />
+        }
+      />
+      {renderChild(1, (
+        <>
+        <Box
+       sx={{
+        flexDirection: 'column', // Use camelCase for CSS properties
+        position: 'relative',
+        minWidth: 0,
+        padding: 0,
+        margin: 0,
+        border: '1px solid #a6a6a6af', // Proper syntax for border value
+        verticalAlign: 'top',
+        width: '100%',
+        borderRadius: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        marginTop: '10px',
+        marginBottom: '15px',
+      }}      
+      >
+          <FormControlLabel
+            label="Companies"
+            control={
+              <Checkbox
+                checked={checked[2]}
+                onChange={handleCheckboxChange(2, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Business Units"
+            control={
+              <Checkbox
+                checked={checked[3]}
+                onChange={handleCheckboxChange(3, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Department"
+            control={
+              <Checkbox
+                checked={checked[4]}
+                onChange={handleCheckboxChange(4, 1)}
+              />
+            }
+          />
+           <FormControlLabel
+            label="Units"
+            control={
+              <Checkbox
+                checked={checked[5]}
+                onChange={handleCheckboxChange(5, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Sub Units"
+            control={
+              <Checkbox
+                checked={checked[6]}
+                onChange={handleCheckboxChange(6, 1)}
+              />
+            }
+          />
+           <FormControlLabel
+            label="Locations"
+            control={
+              <Checkbox
+                checked={checked[7]}
+                onChange={handleCheckboxChange(7, 1)}
+              />
+            }
+          />
+          </Box>
+        </>
+      ))}
+
+      {/* User Management */}
+      <FormControlLabel
+        label="User Management"
+        control={
+          <Checkbox
+            checked={checked[8]}
+            onChange={handleCheckboxChange(8)}
+          />
+        }
+      />
+      {renderChild(8, (
+        <>
+        
+        <Box
+       sx={{
+        flexDirection: 'column', // Use camelCase for CSS properties
+        position: 'relative',
+        minWidth: 0,
+        padding: 0,
+        margin: 0,
+        border: '1px solid #a6a6a6af', // Proper syntax for border value
+        verticalAlign: 'top',
+        width: '100%',
+        borderRadius: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        marginTop: '10px',
+        marginBottom: '15px',
+      }}      
+      >
+          <FormControlLabel
+            label="User Accounts"
+            control={
+              <Checkbox
+                checked={checked[9]}
+                onChange={handleCheckboxChange(9, 8)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Role Management"
+            control={
+              <Checkbox
+                checked={checked[10]}
+                onChange={handleCheckboxChange(10, 8)}
+              />
+            }
+          />
+          </Box>
+        </>
+      ))}
+      </Box>
+    </Box>
         </DialogContent>
           <Divider />
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)} color="error" variant="contained">Cancel</Button>
+            <Button onClick={() => handleClose()} color="error" variant="contained">Cancel</Button>
             <Button type="submit" color="success" variant="contained">Create</Button>
           </DialogActions>
         </form>
       </Dialog>
 
-       {/* Update Daily Sugar Dialog */}
+       {/* Update Role Dialog */}
        <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Update Daily Sugar</DialogTitle>
+       <DialogTitle>
+        {viewAccessPermission ? "Access Permission" : "Update Role"}
+      </DialogTitle>
         <form onSubmit={handleSubmit(handleUpdateRole)}>
         <Divider />
         <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
               <TextField 
+            disabled={viewAccessPermission}
                 {...register('name')} 
                 label="Name" 
                 margin="dense" 
@@ -407,38 +648,219 @@ const Role = () => {
                 error={!!errors.name} 
                 helperText={errors.name?.message} 
               />
-            </Grid>
-            <Grid item xs={6}>
-            
-            </Grid>
-          </Grid>
-          <TextField 
-            {...register('access_permission')} 
-            label="Access Permission" 
-            fullWidth 
-            margin="dense" 
-            error={!!errors.access_permission} 
-            helperText={errors.access_permission?.message} 
+          {errors.access_permission && (
+        <Typography color="error">{errors.access_permission.message}</Typography>
+      )}
+         <Box>
+        
+         <Box
+            sx={{
+              border: '1px solid #a6a6a6', // Enclose CSS values in quotes
+              borderRadius: '10px', // Use camelCase for CSS property names
+              paddingLeft: '10px',
+              paddingRight: '10px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+      {/* Select Role */}
+      <FormControlLabel
+        label="Select Role"
+        control={
+          <Checkbox
+            disabled={viewAccessPermission}
+            {...register('access_permission')}
+            checked={checked.every((val) => val)} // All checked
+            indeterminate={
+              !checked.every((val) => val) && checked.some((val) => val)
+            } // Some but not all are checked
+            onChange={handleSelectAllRole}
           />
+        }
+      />
+      {/* Dashboard */}
+      <FormControlLabel
+        label="Dashboard"
+        control={
+          <Checkbox
+            disabled={viewAccessPermission}
+            checked={checked[0]}
+            onChange={handleCheckboxChange(0)}
+          />
+        }
+      />
+
+      {/* Masterlist */}
+      <FormControlLabel
+        label="Masterlist"
+        control={
+          <Checkbox
+            disabled={viewAccessPermission}
+            checked={checked[1]}
+            onChange={handleCheckboxChange(1)}
+          />
+        }
+      />
+      {renderChild(1, (
+        <>
+        <Box
+       sx={{
+        flexDirection: 'column', // Use camelCase for CSS properties
+        position: 'relative',
+        minWidth: 0,
+        padding: 0,
+        margin: 0,
+        border: '1px solid #a6a6a6af', // Proper syntax for border value
+        verticalAlign: 'top',
+        width: '100%',
+        borderRadius: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        marginTop: '10px',
+        marginBottom: '15px',
+      }}      
+      >
+          <FormControlLabel
+            label="Companies"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[2]}
+                onChange={handleCheckboxChange(2, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Business Units"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[3]}
+                onChange={handleCheckboxChange(3, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Department"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[4]}
+                onChange={handleCheckboxChange(4, 1)}
+              />
+            }
+          />
+           <FormControlLabel
+            label="Units"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[5]}
+                onChange={handleCheckboxChange(5, 1)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Sub Units"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[6]}
+                onChange={handleCheckboxChange(6, 1)}
+              />
+            }
+          />
+           <FormControlLabel
+            label="Locations"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission} 
+                checked={checked[7]}
+                onChange={handleCheckboxChange(7, 1)}
+              />
+            }
+          />
+          </Box>
+        </>
+      ))}
+
+      {/* User Management */}
+      <FormControlLabel
+        label="User Management"
+        control={
+          <Checkbox
+            disabled={viewAccessPermission}
+            checked={checked[8]}
+            onChange={handleCheckboxChange(8)}
+          />
+        }
+      />
+      {renderChild(8, (
+        <>
+        
+        <Box
+       sx={{
+        flexDirection: 'column', // Use camelCase for CSS properties
+        position: 'relative',
+        minWidth: 0,
+        padding: 0,
+        margin: 0,
+        border: '1px solid #a6a6a6af', // Proper syntax for border value
+        verticalAlign: 'top',
+        width: '100%',
+        borderRadius: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        marginTop: '10px',
+        marginBottom: '15px',
+      }}      
+      >
+          <FormControlLabel
+            label="User Accounts"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[9]}
+                onChange={handleCheckboxChange(9, 8)}
+              />
+            }
+          />
+          <FormControlLabel
+            label="Role Management"
+            control={
+              <Checkbox
+                disabled={viewAccessPermission}
+                checked={checked[10]}
+                onChange={handleCheckboxChange(10, 8)}
+              />
+            }
+          />
+          </Box>
+        </>
+      ))}
+      </Box>
+    </Box>
         </DialogContent>
           <Divider />
           <DialogActions>
-            <Button onClick={() => setOpenUpdateDialog(false)} color="error" variant="contained">Cancel</Button>
-            <Button type="submit" color="success" variant="contained">Update</Button>
+            <Button onClick={() => handleClose()} color="error" variant="contained">{viewAccessPermission ? "Close" : "Cancel"}</Button>
+            {viewAccessPermission ? "" : <Button type="submit" color="success" variant="contained">Update</Button>}
+            
           </DialogActions>
         </form>
       </Dialog>
 
       {/* Confirmation Dialog for Delete */}
-      <Dialog open={openDeleteDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+      <Dialog open={openDeleteDialog}>
+        <DialogTitle>{restoreRole ? "Restore" : "Archived"}</DialogTitle>
         <Divider />
         <DialogContent>
-          <Typography>Are you sure you want to archive this record?</Typography>
+          <Typography>Are you sure you want to {restoreRole ? "restore" : "archived"} this record?</Typography>
         </DialogContent>
         <Divider />
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} variant="contained" color="error">Cancel</Button>
+          <Button onClick={() => handleClose()} variant="contained" color="error">Cancel</Button>
           <Button onClick={handleDeleteRole} color="success" variant="contained">Yes</Button>
         </DialogActions>
       </Dialog>
