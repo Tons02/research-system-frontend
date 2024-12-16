@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const apiSlice = createApi({
-  reducerPath: 'api',
+export const apiYmir = createApi({
+  reducerPath: 'ymir',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_YMIR_ENDPOINT, // Corrected base URL
     prepareHeaders: (headers) => {
       // Add the authorization token from localStorage (if it exists)
-      const token = localStorage.getItem("token");
+      const token = import.meta.env.VITE_YMIR_TOKEN;
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -16,24 +16,16 @@ export const apiSlice = createApi({
   }),
   tagTypes: ['Companies'],
   endpoints: (builder) => ({
-   // Companies endpoints
+  // Companies endpoints
   getYmirCompanies: builder.query({
-  query: ({ search, page, per_page, status }) => `/companies?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
+  query: () => `/companies?pagination=none&status=active`,
   method: 'GET',
   providesTags: ['Companies'],
-  }),
-  addUser: builder.mutation({
-    query: (companies) => ({
-      url: `/companies`,
-      method: 'POST',
-      body: companies,
-    }),
-    invalidatesTags: ['Companies'],
   }),
   }),
 });
 
 // Export the generated hooks
 export const {
-  useGetYmirCompaniesQuery
-} = apiSlice;
+  useLazyGetYmirCompaniesQuery 
+} = apiYmir;

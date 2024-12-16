@@ -30,7 +30,7 @@ export const apiSlice = createApi({
   method: 'GET',
   providesTags: ['Companies'],
   }),
-  addCompanies: builder.mutation({
+  syncCompanies: builder.mutation({
     query: (companies) => ({
       url: `/companies`,
       method: 'POST',
@@ -74,6 +74,7 @@ export const apiSlice = createApi({
 export const {
   useLoginMutation,
   useGetCompaniesQuery,
+  useSyncCompaniesMutation,
   useGetRoleQuery,
   useAddRoleMutation,
   useUpdateRoleMutation,

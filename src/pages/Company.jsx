@@ -1,8 +1,10 @@
 import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import { useGetCompaniesQuery } from '../redux/slices/apiSlice';
+import React, { useEffect, useState } from 'react'
+import { useGetCompaniesQuery, useSyncCompaniesMutation } from '../redux/slices/apiSlice';
 import dayjs from 'dayjs';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
+import {  useLazyGetYmirCompaniesQuery } from '../redux/slices/apiYmir';
 
 const Company = () => {
   
@@ -15,33 +17,50 @@ const Company = () => {
 
 
   // Fetch companies with RTK Query hook
-  const { data: companies, isLoading, isError, error, refetch } = useGetCompaniesQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
+  const { data: companies, isLoading: isCompaniesLoading, isError: isCompaniesError, refetch: companiesRefetch } = useGetCompaniesQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
 
 
-const handleSyncCompanies = async () => {
-   
-  try {
-    const response = await archiveDailySugar({ id: selectedID }).unwrap();
-    console.log('Daily Sugar archived:', response);
-    setOpenDeleteDialog(false);
-    refetch();
-    setSnackbar({
-      open: true,
-      message: response?.message,
-      severity: "success",
-    });
-  } catch (errors) {
-    console.error('Error archiving daily sugar:', errors?.data?.errors?.[0]?.detail);
-    setSnackbar({
-      open: true,
-      message: errors?.data?.errors?.[0]?.detail || 'An unexpected error occurred',
-      severity: "error",
-    });
-  }
-};
+  // The trigger function for lazy query and response state
+  const [trigger, { data: ymirCompanies, isLoading: isYmirLoading, isError: isYmirError, }] = useLazyGetYmirCompaniesQuery();
+  const [syncCompanies] = useSyncCompaniesMutation();
+
+  const handleSyncCompanies = async () => {
+    try {
+      console.log(ymirCompanies.result)
+      const payload = {
+        companies: ymirCompanies.result.map(company => ({
+          sync_id: company.id,
+          company_code: company.name,
+          company_name: company.code,
+          updated_at: dayjs(company.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+          deleted_at: company.deleted_at ? dayjs(company.deleted_at).format('YYYY-MM-DD HH:mm:ss') : null
+        }))
+      };
+  
+      // Sending the payload to the syncCompanies function
+      const response = await syncCompanies(payload).unwrap();
+      
+      // Trigger refetch and show success notification
+      companiesRefetch();
+      setOpenDialog(false);
+      setSnackbar({
+        open: true,
+        message: response?.message,
+        severity: "success",
+      });
+    } catch (errors) {
+      console.error('Error syncing companies:', errors?.data?.errors?.[0]?.detail);
+      setSnackbar({
+        open: true,
+        message: errors?.data?.errors?.[0]?.detail || 'An unexpected error occurred',
+        severity: "error",
+      });
+    }
+  };
+  
 
 const handleSync = () => {
-  
+  trigger();
   setOpenDialog(true);
 };
 
@@ -68,10 +87,10 @@ const handleChangeStatus = (event) => {
   // Update status based on checkbox state
   if (event.target.checked) {
     setStatus("inactive");
-    refetch()
+    companiesRefetch()
   } else {
     setStatus("active");
-    refetch()
+    companiesRefetch()
   }
 };
   return (
@@ -131,7 +150,7 @@ const handleChangeStatus = (event) => {
         </TableHead>
         <TableBody>
           {/* If loading, show skeleton loader */}
-          {isLoading ? (
+          {isCompaniesLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell align="center" component="th" scope="row">
@@ -157,7 +176,7 @@ const handleChangeStatus = (event) => {
                 </TableCell>
               </TableRow>
             ))
-          ) : isError ? (
+          ) : isCompaniesError ? (
             // If error, show error message
             <TableRow>
               <TableCell colSpan={6} align="center">
@@ -208,7 +227,8 @@ const handleChangeStatus = (event) => {
         <Divider />
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} variant="contained" color="error">Cancel</Button>
-          <Button onClick={handleSyncCompanies} color="success" variant="contained">Yes, Archive</Button>
+          <Button onClick={handleSyncCompanies} color="success" variant="contained"  disabled={isCompaniesLoading} // Disable the button while loading
+            startIcon={isCompaniesLoading && <CircularProgress size={20} />} >{isCompaniesLoading ? "Loading..." : "Yes"}</Button>
         </DialogActions>
       </Dialog>
 
