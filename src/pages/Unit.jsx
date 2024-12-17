@@ -1,12 +1,12 @@
 import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import { useGetDepartmentsQuery, useSyncDepartmentsMutation } from '../redux/slices/apiSlice';
+import { useGetUnitsQuery, useSyncUnitsMutation } from '../redux/slices/apiSlice';
 import dayjs from 'dayjs';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
-import {  useLazyGetYmirDepartmentsQuery } from '../redux/slices/apiYmir';
+import {  useLazyGetYmirUnitsQuery } from '../redux/slices/apiYmir';
 
-const Department = () => {
+const Unit = () => {
   
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -15,40 +15,40 @@ const Department = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
 
-  // Fetch Department with RTK Query hook
-  const { data: departments, isLoading: isDepartmentLoading, isError: isDepartmentError, refetch: departmentRefetch } = useGetDepartmentsQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
+  // Fetch Unit with RTK Query hook
+  const { data: units, isLoading: isUnitLoading, isError: isUnitError, refetch: unitsRefetch } = useGetUnitsQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
 
   // The trigger function for lazy query and response state
-  const [trigger, { data: ymirDepartments, isLoading: isYmirLoading, isError: isYmirError, }] = useLazyGetYmirDepartmentsQuery();
-  const [syncDepartments] = useSyncDepartmentsMutation();
+  const [trigger, { data: ymirUnits, isLoading: isYmirLoading, isError: isYmirError, }] = useLazyGetYmirUnitsQuery();
+  const [syncUnits] = useSyncUnitsMutation();
 
-  const handleSyncDepartments = () => {
+  const handleSyncUnits = () => {
     trigger()
       .unwrap() // Ensure to extract the response
       .then(response => {
-        const ymirDepartments = response?.result;
+        const ymirUnits = response?.result;
   
-        if (!ymirDepartments || ymirDepartments.length === 0) {
-          throw new Error("No department data found to sync.");
+        if (!ymirUnits || ymirUnits.length === 0) {
+          throw new Error("No units data found to sync.");
         }
   
         const payload = {
-        departments: ymirDepartments.map(department => ({
-            sync_id: department.id,
-            department_name: department.name,
-            department_code: department.code,
-            business_unit_id: department.business_unit.id,
-            updated_at: dayjs(department.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-            deleted_at: department.deleted_at ? dayjs(department.deleted_at).format('YYYY-MM-DD HH:mm:ss') : null
+          units: ymirUnits.map(unit => ({
+            sync_id: unit.id,
+            unit_code: unit.code,
+            unit_name: unit.name,
+            department_id: unit.department.id,
+            updated_at: dayjs(unit.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+            deleted_at: unit.deleted_at ? dayjs(unit.deleted_at).format('YYYY-MM-DD HH:mm:ss') : null
           }))
         };
   
-        // Return the syncDepartments call to maintain promise chaining
-        return syncDepartments(payload).unwrap();
+        // Return the syncUnits call to maintain promise chaining
+        return syncUnits(payload).unwrap();
       })
       .then(syncResponse => {
         // Trigger refetch and show success notification
-        departmentRefetch();
+        unitsRefetch();
         setOpenDialog(false);
         setSnackbar({
           open: true,
@@ -57,8 +57,8 @@ const Department = () => {
         });
       })
       .catch(error => {
-        // Handle errors from either trigger or syncDepartments
-        console.error('Error syncing department:', error?.message);
+        // Handle errors from either trigger or syncUnits
+        console.error('Error syncing units:', error?.message);
         setSnackbar({
           open: true,
           message: error?.data?.errors?.[0]?.detail || error.message || 'An unexpected error occurred',
@@ -100,12 +100,12 @@ const handleChangeStatus = (event) => {
   return (
     <>
      <Typography variant="h4" gutterBottom>
-       Departments
+       Units
      </Typography>
      <Breadcrumbs aria-label="breadcrumb" sx={{ paddingBottom: 2 }}>
         <Link color="inherit" href="/">Home</Link>
         <Link color="inherit" href="/dashboard/masterlist">Masterlist</Link>
-        <Link color="inherit" href="/dashboard/masterlist/department">Department</Link>
+        <Link color="inherit" href="/dashboard/masterlist/units">Units</Link>
       </Breadcrumbs>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Button
@@ -145,16 +145,16 @@ const handleChangeStatus = (event) => {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell align="center">Department Code</TableCell>
-            <TableCell align="center">Department Name</TableCell>
-            <TableCell align="center">Business Unit</TableCell>
+            <TableCell align="center">Unit Code</TableCell>
+            <TableCell align="center">Unit Name</TableCell>
+            <TableCell align="center">Department</TableCell>
             <TableCell align="center">Created At</TableCell>
             <TableCell align="center">Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {/* If loading, show skeleton loader */}
-          {isDepartmentLoading ? (
+          {isUnitLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell align="center" component="th" scope="row">
@@ -180,7 +180,7 @@ const handleChangeStatus = (event) => {
                 </TableCell>
               </TableRow>
             ))
-          ) : isDepartmentError ? (
+          ) : isUnitError ? (
             // If error, show error message
             <TableRow>
               <TableCell colSpan={6} align="center">
@@ -189,12 +189,12 @@ const handleChangeStatus = (event) => {
             </TableRow>
           ) : (
             // Once data is loaded, render the rows
-            departments?.data?.data?.map((row) => (
+            units?.data?.data?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell align="center" scope="row">{row.sync_id}</TableCell>
-                <TableCell align="center">{row.department_code}</TableCell>
-                <TableCell align="center">{row.department_name}</TableCell>
-                <TableCell align="center">{row.business_unit.business_unit_name}</TableCell>
+                <TableCell align="center">{row.unit_code}</TableCell>
+                <TableCell align="center">{row.unit_name}</TableCell>
+                <TableCell align="center">{row.department.department_name}</TableCell>
                 <TableCell align="center">{dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
                 <TableCell align="center">
                 {row.deleted_at === null ? (
@@ -213,7 +213,7 @@ const handleChangeStatus = (event) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={departments?.data?.data?.length || 0}
+          count={units?.data?.data?.length || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -231,7 +231,7 @@ const handleChangeStatus = (event) => {
         <Divider />
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} variant="contained" color="error">Cancel</Button>
-          <Button onClick={handleSyncDepartments} color="success" variant="contained"  disabled={isYmirLoading} // Disable the button while loading
+          <Button onClick={handleSyncUnits} color="success" variant="contained"  disabled={isYmirLoading} // Disable the button while loading
             startIcon={isYmirLoading && <CircularProgress size={20} />} >{isYmirLoading ? "" : "Yes"}</Button>
         </DialogActions>
       </Dialog>
@@ -251,4 +251,4 @@ const handleChangeStatus = (event) => {
   )
 }
 
-export default Department;
+export default Unit;

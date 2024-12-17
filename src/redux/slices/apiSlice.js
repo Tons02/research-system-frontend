@@ -14,7 +14,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Companies', 'Roles', 'BusinessUnits','Departments'],
+  tagTypes: ['Companies', 'Roles', 'BusinessUnits','Departments','Units', 'Location'],
   endpoints: (builder) => ({
     // Login endpoints
     login: builder.mutation({
@@ -66,6 +66,20 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Departments'],
     }),
+    // units endpoints
+  getUnits: builder.query({
+    query: ({ search, page, per_page, status }) => `/units?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
+    method: 'GET',
+    providesTags: ['Departments'],
+    }),
+    syncUnits: builder.mutation({
+      query: (units) => ({
+        url: `/units`,
+        method: 'POST',
+        body: units,
+      }),
+      invalidatesTags: ['Units'],
+    }),
   getRole: builder.query({
     query: ({ search, page, per_page, status }) => `/role?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
     method: 'GET',
@@ -107,6 +121,8 @@ export const {
   useSyncBusinessUnitsMutation,
   useGetDepartmentsQuery,
   useSyncDepartmentsMutation,
+  useGetUnitsQuery,
+  useSyncUnitsMutation,
   useGetRoleQuery,
   useAddRoleMutation,
   useUpdateRoleMutation,
