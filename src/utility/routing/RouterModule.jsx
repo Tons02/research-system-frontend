@@ -13,6 +13,7 @@ import UserManagement from "../../pages/UserManagement";
 import User from "../../pages/User";
 import Role from "../../pages/Role";
 import BusinessUnit from "../../pages/BusinessUnit";
+import Department from "../../pages/Department";
 
 const router = createBrowserRouter([
     {
@@ -59,6 +60,18 @@ const router = createBrowserRouter([
                     context="routing"
                   >
                   <BusinessUnit/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "masterlist/department",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="masterlist:departments:sync"
+                    context="routing"
+                  >
+                  <Department/>
                 </AccessPermissionContext>
             )
           },

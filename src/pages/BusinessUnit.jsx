@@ -151,6 +151,7 @@ const handleChangeStatus = (event) => {
             <TableCell>ID</TableCell>
             <TableCell align="center">Business Unit Code</TableCell>
             <TableCell align="center">Business Unit Name</TableCell>
+            <TableCell align="center">Company</TableCell>
             <TableCell align="center">Created At</TableCell>
             <TableCell align="center">Status</TableCell>
           </TableRow>
@@ -168,6 +169,9 @@ const handleChangeStatus = (event) => {
                 </TableCell>
                 <TableCell align="center">
                   <Skeleton width="60%" />
+                </TableCell>
+                <TableCell align="center">
+                  <Skeleton width="80%" />
                 </TableCell>
                 <TableCell align="center">
                   <Skeleton width="80%" />
@@ -194,6 +198,7 @@ const handleChangeStatus = (event) => {
                 <TableCell align="center" scope="row">{row.sync_id}</TableCell>
                 <TableCell align="center">{row.business_unit_code}</TableCell>
                 <TableCell align="center">{row.business_unit_name}</TableCell>
+                <TableCell align="center">{row.company.company_name}</TableCell>
                 <TableCell align="center">{dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
                 <TableCell align="center">
                 {row.deleted_at === null ? (
