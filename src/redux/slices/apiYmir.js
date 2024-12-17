@@ -8,13 +8,13 @@ export const apiYmir = createApi({
       // Add the authorization token from localStorage (if it exists)
       const token = import.meta.env.VITE_YMIR_TOKEN;
       if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+        headers.set('Token', `Bearer ${token}`);
       }
       headers.set("Accept", "application/json"); // JSON content type
       return headers;
     },
   }),
-  tagTypes: ['Companies'],
+  tagTypes: ['Companies', 'BusinessUnits'],
   endpoints: (builder) => ({
   // Companies endpoints
   getYmirCompanies: builder.query({
@@ -22,10 +22,16 @@ export const apiYmir = createApi({
   method: 'GET',
   providesTags: ['Companies'],
   }),
+  getYmirBusinessUnits: builder.query({
+    query: () => `/business-units?pagination=none&status=active`,
+    method: 'GET',
+    providesTags: ['BusinessUnits'],
+    }),
   }),
 });
 
 // Export the generated hooks
 export const {
-  useLazyGetYmirCompaniesQuery 
+  useLazyGetYmirCompaniesQuery,
+  useLazyGetYmirBusinessUnitsQuery 
 } = apiYmir;

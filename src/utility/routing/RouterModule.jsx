@@ -12,6 +12,7 @@ import Company from "../../pages/Company";
 import UserManagement from "../../pages/UserManagement";
 import User from "../../pages/User";
 import Role from "../../pages/Role";
+import BusinessUnit from "../../pages/BusinessUnit";
 
 const router = createBrowserRouter([
     {
@@ -46,6 +47,18 @@ const router = createBrowserRouter([
                     context="routing"
                   >
                   <Company/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "masterlist/business_unit",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="masterlist:business-units:sync"
+                    context="routing"
+                  >
+                  <BusinessUnit/>
                 </AccessPermissionContext>
             )
           },
@@ -86,18 +99,6 @@ const router = createBrowserRouter([
                 </AccessPermissionContext>
             )
           },
-        //   {
-        //       path: "monitoring",
-        //       index: true,
-        //       element: (
-        //         <AccessPermissionContext
-        //           permission="user"
-        //           context="routing"
-        //         >
-        //         <DailyMonitoring/>
-        //       </AccessPermissionContext>
-        //   )
-        //   },
         //   {
         //     path: "sugarConverter",
         //     index: true,
