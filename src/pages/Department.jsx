@@ -91,10 +91,10 @@ const handleChangeStatus = (event) => {
   // Update status based on checkbox state
   if (event.target.checked) {
     setStatus("inactive");
-    businessUnitsRefetch()
+    subUnitsRefetch()
   } else {
     setStatus("active");
-    businessUnitsRefetch()
+    subUnitsRefetch()
   }
 };
   return (
@@ -213,7 +213,7 @@ const handleChangeStatus = (event) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={subUnits?.data?.total || 0}
+          count={departments?.data?.total || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

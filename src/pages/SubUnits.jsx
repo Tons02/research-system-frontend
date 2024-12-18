@@ -91,10 +91,10 @@ const handleChangeStatus = (event) => {
   // Update status based on checkbox state
   if (event.target.checked) {
     setStatus("inactive");
-    businessUnitsRefetch()
+    subUnitsRefetch()
   } else {
     setStatus("active");
-    businessUnitsRefetch()
+    subUnitsRefetch()
   }
 };
   return (

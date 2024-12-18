@@ -94,10 +94,10 @@ const handleChangeStatus = (event) => {
   // Update status based on checkbox state
   if (event.target.checked) {
     setStatus("inactive");
-    businesslocationsRefetch()
+    locationsRefetch()
   } else {
     setStatus("active");
-    businesslocationsRefetch()
+    locationsRefetch()
   }
 };
   return (
@@ -237,15 +237,41 @@ const handleChangeStatus = (event) => {
       </Box>
     </TableContainer>
 
-    <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-    <DialogTitle>{isViewMode ? "View Details" : "Confirmation"}</DialogTitle>
+    <Dialog open={openDialog} onClose={() => setOpenDialog(false)} sx={{
+        '& .MuiDialog-paper': {
+            width: '400px', 
+            maxWidth: '500px', 
+            height: 'auto', 
+        },
+    }}>
+    <DialogTitle>{isViewMode ? "Sub Units" : "Confirmation"}</DialogTitle>
     <Divider />
     <DialogContent>
-        {/* Conditionally render Dialog content based on mode */}
         {isViewMode ? (
         <Typography>
-            {/* Display details of the selected row */}
-            Sub Units: {selectedRow?.sub_unit?.map(sub => sub.sub_unit_name).join(", ") || "No sub-units available"}
+           {selectedRow?.sub_unit && selectedRow.sub_unit.length > 0 ? (
+        <Typography 
+          component="div" 
+          sx={{ display: 'flex', flexWrap: 'wrap', gap: .5 }}
+        >
+          {selectedRow.sub_unit.map((sub, index) => (
+            <Typography 
+              key={index} 
+              sx={{
+                backgroundColor: 'grey.200',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '0.875rem', // Optional font styling
+                marginBottom: '4px', // Spacing for each row if wrapped
+              }}
+            >
+              {sub.sub_unit_name}
+            </Typography>
+          ))}
+        </Typography>
+      ) : (
+        <Typography>No sub-units available</Typography>
+      )}
         </Typography>
         ) : (
         <Typography>Are you sure you want to SYNC the data?</Typography>
