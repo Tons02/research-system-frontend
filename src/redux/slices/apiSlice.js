@@ -70,7 +70,7 @@ export const apiSlice = createApi({
   getUnits: builder.query({
     query: ({ search, page, per_page, status }) => `/units?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
     method: 'GET',
-    providesTags: ['Departments'],
+    providesTags: ['Units'],
     }),
     syncUnits: builder.mutation({
       query: (units) => ({
@@ -79,6 +79,34 @@ export const apiSlice = createApi({
         body: units,
       }),
       invalidatesTags: ['Units'],
+    }),
+    // sub units endpoints
+  getSubUnits: builder.query({
+    query: ({ search, page, per_page, status }) => `/sub-units?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
+    method: 'GET',
+    providesTags: ['SubUnits'],
+    }),
+  syncSubUnits: builder.mutation({
+      query: (subUnits) => ({
+        url: `/sub-units`,
+        method: 'POST',
+        body: subUnits,
+      }),
+      invalidatesTags: ['SubUnits'],
+    }),
+    // locations endpoints
+  getLocations: builder.query({
+    query: ({ search, page, per_page, status }) => `/locations?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
+    method: 'GET',
+    providesTags: ['Locations'],
+    }),
+  syncLocations: builder.mutation({
+      query: (locations) => ({
+        url: `/locations`,
+        method: 'POST',
+        body: locations,
+      }),
+      invalidatesTags: ['Locations'],
     }),
   getRole: builder.query({
     query: ({ search, page, per_page, status }) => `/role?search=${search}&page=${page}&per_page=${per_page}&status=${status}`,
@@ -123,6 +151,10 @@ export const {
   useSyncDepartmentsMutation,
   useGetUnitsQuery,
   useSyncUnitsMutation,
+  useGetSubUnitsQuery,
+  useSyncSubUnitsMutation,
+  useGetLocationsQuery,
+  useSyncLocationsMutation,
   useGetRoleQuery,
   useAddRoleMutation,
   useUpdateRoleMutation,

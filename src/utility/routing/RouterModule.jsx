@@ -15,6 +15,8 @@ import Role from "../../pages/Role";
 import BusinessUnit from "../../pages/BusinessUnit";
 import Department from "../../pages/Department";
 import Unit from "../../pages/Unit";
+import SubUnit from "../../pages/SubUnits";
+import Location from "../../pages/Locations";
 
 const router = createBrowserRouter([
     {
@@ -85,6 +87,30 @@ const router = createBrowserRouter([
                     context="routing"
                   >
                   <Unit/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "masterlist/sub_unit",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="masterlist:subunits:sync"
+                    context="routing"
+                  >
+                  <SubUnit/>
+                </AccessPermissionContext>
+            )
+          },
+          {
+            path: "masterlist/locations",
+            index: true,
+            element: (
+                 <AccessPermissionContext
+                    permission="masterlist:locations:sync"
+                    context="routing"
+                  >
+                  <Location/>
                 </AccessPermissionContext>
             )
           },

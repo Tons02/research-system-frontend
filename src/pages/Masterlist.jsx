@@ -45,10 +45,10 @@ const Masterlist = () => {
       <Card destination="unit" icon={<BallotIcon />} title="Units" subtitle="Synching of Units Masterlist from Ymir to Lotus"/>
       )}
       {accessPermissions.includes("masterlist:subunits:sync") && (
-      <Card destination="subUnit" icon={<ViewHeadlineIcon/>} title="Sub Units" subtitle="Synching of Sub Units Masterlist from Ymir to Lotus"/>
+      <Card destination="sub_unit" icon={<ViewHeadlineIcon/>} title="Sub Units" subtitle="Synching of Sub Units Masterlist from Ymir to Lotus"/>
       )}
       {accessPermissions.includes("masterlist:locations:sync") && (
-      <Card destination="location" icon={<ShareLocationIcon/>} title="Locations" subtitle="Synching of Locations Masterlist from Ymir to Lotus"/>
+      <Card destination="locations" icon={<ShareLocationIcon/>} title="Locations" subtitle="Synching of Locations Masterlist from Ymir to Lotus"/>
       )}
       </Box>
       </>

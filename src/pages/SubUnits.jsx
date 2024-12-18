@@ -1,12 +1,12 @@
 import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
-import { useGetBusinessUnitsQuery, useSyncBusinessUnitsMutation } from '../redux/slices/apiSlice';
+import { useGetSubUnitsQuery, useSyncSubUnitsMutation } from '../redux/slices/apiSlice';
 import dayjs from 'dayjs';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
-import {  useLazyGetYmirBusinessUnitsQuery } from '../redux/slices/apiYmir';
+import {  useLazyGetYmirSubUnitsQuery } from '../redux/slices/apiYmir';
 
-const BusinessUnit = () => {
+const SubUnit = () => {
   
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -15,40 +15,40 @@ const BusinessUnit = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
 
-  // Fetch business Unit with RTK Query hook
-  const { data: businessUnits, isLoading: isBusinessUnitsLoading, isError: isBusinessUnitsError, refetch: businessUnitsRefetch } = useGetBusinessUnitsQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
+  // Fetch Sub Unit with RTK Query hook
+  const { data: subUnits, isLoading: isSubUnitLoading, isError: isSubUnitError, refetch: subUnitsRefetch } = useGetSubUnitsQuery({ search, page: page + 1, per_page: rowsPerPage, status  });
 
   // The trigger function for lazy query and response state
-  const [trigger, { data: ymirBusinessUnits, isLoading: isYmirLoading, isError: isYmirError, }] = useLazyGetYmirBusinessUnitsQuery();
-  const [syncBusinessUnits] = useSyncBusinessUnitsMutation();
+  const [trigger, { data: ymirSubUnits, isLoading: isYmirLoading, isError: isYmirError, }] = useLazyGetYmirSubUnitsQuery();
+  const [syncSubUnits] = useSyncSubUnitsMutation();
 
-  const handleSyncBusinessUnits = () => {
+  const handleSyncUnits = () => {
     trigger()
       .unwrap() // Ensure to extract the response
       .then(response => {
-        const ymirBusinessUnits = response?.result;
+        const ymirSubUnits = response?.result;
   
-        if (!ymirBusinessUnits || ymirBusinessUnits.length === 0) {
-          throw new Error("No business unit data found to sync.");
+        if (!ymirSubUnits || ymirSubUnits.length === 0) {
+          throw new Error("No units data found to sync.");
         }
   
         const payload = {
-          business_units: ymirBusinessUnits.map(business_unit => ({
-            sync_id: business_unit.id,
-            business_unit_name: business_unit.name,
-            business_unit_code: business_unit.code,
-            company_id: business_unit.company_id,
-            updated_at: dayjs(business_unit.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-            deleted_at: business_unit.deleted_at ? dayjs(business_unit.deleted_at).format('YYYY-MM-DD HH:mm:ss') : null
+        sub_units: ymirSubUnits.map(sub_unit => ({
+            sync_id: sub_unit.id,
+            sub_unit_code: sub_unit.code,
+            sub_unit_name: sub_unit.name,
+            unit_id: sub_unit.department_unit.id,
+            updated_at: dayjs(sub_unit.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+            deleted_at: sub_unit.deleted_at ? dayjs(sub_unit.deleted_at).format('YYYY-MM-DD HH:mm:ss') : null
           }))
         };
   
-        // Return the syncBusinessUnits call to maintain promise chaining
-        return syncBusinessUnits(payload).unwrap();
+        // Return the syncSubUnits call to maintain promise chaining
+        return syncSubUnits(payload).unwrap();
       })
       .then(syncResponse => {
         // Trigger refetch and show success notification
-        businessUnitsRefetch();
+        subUnitsRefetch();
         setOpenDialog(false);
         setSnackbar({
           open: true,
@@ -57,8 +57,8 @@ const BusinessUnit = () => {
         });
       })
       .catch(error => {
-        // Handle errors from either trigger or syncBusinessUnits
-        console.error('Error syncing business Units:', error?.message);
+        // Handle errors from either trigger or syncSubUnits
+        console.error('Error syncing sub units:', error?.message);
         setSnackbar({
           open: true,
           message: error?.data?.errors?.[0]?.detail || error.message || 'An unexpected error occurred',
@@ -67,10 +67,6 @@ const BusinessUnit = () => {
       })
   };
   
-
-const handleSync = () => {
-  setOpenDialog(true);
-};
 
 const [snackbar, setSnackbar] = useState({
   open: false,
@@ -104,18 +100,18 @@ const handleChangeStatus = (event) => {
   return (
     <>
      <Typography variant="h4" gutterBottom>
-       Business Units
+      Sub Units
      </Typography>
      <Breadcrumbs aria-label="breadcrumb" sx={{ paddingBottom: 2 }}>
         <Link color="inherit" href="/">Home</Link>
         <Link color="inherit" href="/dashboard/masterlist">Masterlist</Link>
-        <Link color="inherit" href="/dashboard/masterlist/business-unit">Business Units</Link>
+        <Link color="inherit" href="/dashboard/masterlist/sub-units">Sub Units</Link>
       </Breadcrumbs>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Button
           variant="contained"
           color="success"
-          onClick={() => handleSync()}
+          onClick={() =>  setOpenDialog(true)}
           sx={{ marginLeft: 'auto' }}
         >
           Sync
@@ -149,16 +145,16 @@ const handleChangeStatus = (event) => {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell align="center">Business Unit Code</TableCell>
-            <TableCell align="center">Business Unit Name</TableCell>
-            <TableCell align="center">Company</TableCell>
+            <TableCell align="center">Sub Unit Code</TableCell>
+            <TableCell align="center">Sub Unit Name</TableCell>
+            <TableCell align="center">Unit</TableCell>
             <TableCell align="center">Created At</TableCell>
             <TableCell align="center">Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {/* If loading, show skeleton loader */}
-          {isBusinessUnitsLoading ? (
+          {isSubUnitLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell align="center" component="th" scope="row">
@@ -184,7 +180,7 @@ const handleChangeStatus = (event) => {
                 </TableCell>
               </TableRow>
             ))
-          ) : isBusinessUnitsError ? (
+          ) : isSubUnitError ? (
             // If error, show error message
             <TableRow>
               <TableCell colSpan={6} align="center">
@@ -193,12 +189,12 @@ const handleChangeStatus = (event) => {
             </TableRow>
           ) : (
             // Once data is loaded, render the rows
-            businessUnits?.data?.data?.map((row) => (
+            subUnits?.data?.data?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell align="center" scope="row">{row.sync_id}</TableCell>
-                <TableCell align="center">{row.business_unit_code}</TableCell>
-                <TableCell align="center">{row.business_unit_name}</TableCell>
-                <TableCell align="center">{row.company.company_name}</TableCell>
+                <TableCell align="center">{row.sub_unit_code}</TableCell>
+                <TableCell align="center">{row.sub_unit_name}</TableCell>
+                <TableCell align="center">{row.unit?.unit_name}</TableCell>
                 <TableCell align="center">{dayjs(row.created_at).format('YYYY-MM-DD')}</TableCell>
                 <TableCell align="center">
                 {row.deleted_at === null ? (
@@ -217,7 +213,7 @@ const handleChangeStatus = (event) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={businessUnits?.data?.total || 0}
+          count={subUnits?.data?.total || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -235,7 +231,7 @@ const handleChangeStatus = (event) => {
         <Divider />
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} variant="contained" color="error">Cancel</Button>
-          <Button onClick={handleSyncBusinessUnits} color="success" variant="contained"  disabled={isYmirLoading} // Disable the button while loading
+          <Button onClick={handleSyncUnits} color="success" variant="contained"  disabled={isYmirLoading} // Disable the button while loading
             startIcon={isYmirLoading && <CircularProgress size={20} />} >{isYmirLoading ? "" : "Yes"}</Button>
         </DialogActions>
       </Dialog>
@@ -255,4 +251,4 @@ const handleChangeStatus = (event) => {
   )
 }
 
-export default BusinessUnit
+export default SubUnit;

@@ -14,7 +14,7 @@ export const apiYmir = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Companies', 'BusinessUnits', 'Departments', 'Units'],
+  tagTypes: ['Companies', 'BusinessUnits', 'Departments', 'Units', 'SubUnits',  'Locations'],
   endpoints: (builder) => ({
   // Companies endpoints
   getYmirCompanies: builder.query({
@@ -37,6 +37,16 @@ export const apiYmir = createApi({
     method: 'GET',
     providesTags: ['Units'],
   }),
+  getYmirSubUnits: builder.query({
+    query: () => `/sub_units?pagination=none&status=active`,
+    method: 'GET',
+    providesTags: ['SubUnits'],
+  }),
+  getYmirLocations: builder.query({
+    query: () => `/locations?pagination=none&status=active`,
+    method: 'GET',
+    providesTags: ['Locations'],
+  }),
   }),
 });
 
@@ -45,5 +55,7 @@ export const {
   useLazyGetYmirCompaniesQuery,
   useLazyGetYmirBusinessUnitsQuery,
   useLazyGetYmirDepartmentsQuery,
-  useLazyGetYmirUnitsQuery 
+  useLazyGetYmirUnitsQuery,
+  useLazyGetYmirSubUnitsQuery,
+  useLazyGetYmirLocationsQuery 
 } = apiYmir;
