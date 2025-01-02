@@ -72,9 +72,6 @@ const BusinessUnit = () => {
   };
   
 
-const handleSync = () => {
-  setOpenDialog(true);
-};
 
 const [snackbar, setSnackbar] = useState({
   open: false,
@@ -143,7 +140,7 @@ const handleChangeStatus = (event) => {
          <Button
             variant="contained"
             color="success"
-            onClick={() => handleSync()}
+            onClick={() => setOpenDialog(true)}
             sx={{ marginLeft: 'auto', borderRadius: "10px", }}
           >
             Sync

@@ -72,11 +72,6 @@ const Company = () => {
         });
       })
   };
-  
-
-const handleSync = () => {
-  setOpenDialog(true);
-};
 
 const [snackbar, setSnackbar] = useState({
   open: false,
@@ -142,7 +137,7 @@ const handleChangeStatus = (event) => {
         <Button
           variant="contained"
           color="success"
-          onClick={() => handleSync()}
+          onClick={() => setOpenDialog(true)}
           sx={{ marginLeft: 'auto', borderRadius: "10px", }}
         >
           Sync
@@ -162,7 +157,7 @@ const handleChangeStatus = (event) => {
         sx={{ padding: 1.5}} // Adding padding here
       >
         <FormControlLabel
-          control={<Checkbox color="success" onChange={handleChangeStatus} />}
+          control={<w color="success" onChange={handleChangeStatus} />}
           label="Archived" />
        <TextField
           label={
