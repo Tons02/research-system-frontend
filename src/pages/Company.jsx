@@ -117,13 +117,10 @@ const handleChangeStatus = (event) => {
           Dashboard
         </Link>
         <Link
+          underline="hover"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            textDecoration: 'none', // Ensures no underline by default
-            '&:hover': {
-              textDecoration: 'underline', // Adds underline on hover
-            },
           }}
           color="inherit"
           href="/dashboard/masterlist"
@@ -146,7 +143,7 @@ const handleChangeStatus = (event) => {
           variant="contained"
           color="success"
           onClick={() => handleSync()}
-          sx={{ marginLeft: 'auto' }}
+          sx={{ marginLeft: 'auto', borderRadius: "10px", }}
         >
           Sync
         </Button>
@@ -187,7 +184,7 @@ const handleChangeStatus = (event) => {
             width: 250,
             height: 50,
             marginTop: 1,
-            marginRight: 2,
+            marginRight: 1,
             backgroundColor: "#f5f5f5", // Light gray background
             borderRadius: "15px",
             "& .MuiOutlinedInput-root": {
