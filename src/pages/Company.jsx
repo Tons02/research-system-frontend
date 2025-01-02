@@ -8,7 +8,6 @@ import {  useLazyGetYmirCompaniesQuery } from '../redux/slices/apiYmir';
 import { Dashboard } from '@mui/icons-material';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 
 const Company = () => {
