@@ -1,13 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Alert, Box, Breadcrumbs, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, Grid, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Select, Skeleton, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
+import Link from '@mui/material/Link';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom'
 import { RoleSchema } from '../validations/validation';
 import { useAddRoleMutation, useArchivedRoleMutation, useGetRoleQuery, useUpdateRoleMutation } from '../redux/slices/apiSlice';
 import dayjs from 'dayjs';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Dashboard } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const Role = () => {
   const [page, setPage] = useState(0);
@@ -21,6 +25,7 @@ const Role = () => {
   const [viewAccessPermission, setViewAccessPermission] = useState(false);
   const [restoreRole, setRestoreRole] = useState(false);
   const [activeMenuRow, setActiveMenuRow] = useState(null); 
+  const [localSearch, setLocalSearch] = useState("");
   
 
 
@@ -278,20 +283,44 @@ const Role = () => {
 
   return (
     <>
-     <Typography variant="h4" gutterBottom>
-       Role
-     </Typography>
-     <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" href="/">Home</Link>
-        <Link color="inherit" href="/dashboard/masterlist">User Management</Link>
-        <Link color="inherit" href="/dashboard/masterlist/company">Role</Link>
+     <Breadcrumbs aria-label="breadcrumb" sx={{ marginBottom:1 }}>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/"
+        >
+          <Dashboard sx={{ mr: 0.5 }} fontSize="inherit" />
+          Dashboard
+        </Link>
+        <Link
+          underline="hover"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          color="inherit"
+          href="/dashboard/masterlist"
+        >
+        <AssignmentIndIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+          User Management
+        </Link>
+        <Typography
+          sx={{ color: 'text.primary', display: 'flex', alignItems: 'center' }}
+        >
+          <ManageAccountsIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+          Role
+        </Typography>
       </Breadcrumbs>
+       <Typography variant="h4">
+          Role
+        </Typography>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
         <Button
           variant="contained"
           color="success"
           onClick={() => handleCreate()}
-          sx={{ marginLeft: 'auto' }}
+          sx={{ marginLeft: 'auto', borderRadius: "10px", }}
         >
           ADD
         </Button>
@@ -313,11 +342,41 @@ const Role = () => {
           control={<Checkbox color="success" onChange={handleChangeStatus} />}
           label="Archived" />
         <TextField
-          label="Search"
+          label={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <SearchIcon sx={{ fontSize: 18 }} />
+              Search
+            </Box>
+          }
           variant="outlined"
-          value={search}
-          onChange={handleSearchChange}
-          sx={{ width: 300}} />
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setSearch(e.target.value); 
+              console.log("Search term:", e.target.value);
+            }
+          }}
+          sx={{
+            width: 250,
+            height: 50,
+            marginTop: 1,
+            marginRight: 1,
+            backgroundColor: "#f5f5f5", // Light gray background
+            borderRadius: "15px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "15px",
+              height: 50,
+              "& fieldset": {
+                borderColor: "#5a6872", // Border color
+              },
+              "&:hover fieldset": {
+                borderColor: "#5a6872",
+              },
+            },
+          }}
+        />
+
       </Box>
       <Box sx={{ flex: 1, overflow: 'auto'}}>
       <Table  sx={{ minWidth: 650 }} aria-label="simple table">
